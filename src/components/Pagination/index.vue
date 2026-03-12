@@ -8,10 +8,33 @@
       :page-sizes="pageSizes"
       :pager-count="pagerCount"
       :total="total"
+      :total-text="totalText"
+      :prev-text="prevText"
+      :next-text="nextText"
       v-bind="$attrs"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-    />
+    >
+      <!-- 自定义插槽来翻译其他文本 -->
+      <template slot="total">
+        {{ totalText }} {{ total }} {{ itemsText }}
+      </template>
+      <template slot="sizes">
+        <el-select v-model="pageSize" size="small" @change="handleSizeChange">
+          <el-option
+            v-for="item in pageSizes"
+            :key="item"
+            :label="item + ' ' + perPageText"
+            :value="item"
+          />
+        </el-select>
+      </template>
+      <template slot="jumper">
+        {{ gotoText }}
+        <input type="number" min="1" :max="totalPages" @keyup.enter="handleCurrentChange($event.target.value)" />
+        {{ pageText }}
+      </template>
+    </el-pagination>
   </div>
 </template>
 
@@ -59,6 +82,35 @@ export default {
     hidden: {
       type: Boolean,
       default: false
+    },
+    // 国际化相关属性
+    totalText: {
+      type: String,
+      default: '共'
+    },
+    itemsText: {
+      type: String,
+      default: '条'
+    },
+    pageText: {
+      type: String,
+      default: '页'
+    },
+    gotoText: {
+      type: String,
+      default: '前往'
+    },
+    perPageText: {
+      type: String,
+      default: '条/页'
+    },
+    prevText: {
+      type: String,
+      default: '上一页'
+    },
+    nextText: {
+      type: String,
+      default: '下一页'
     }
   },
   data() {
@@ -81,6 +133,9 @@ export default {
       set(val) {
         this.$emit('update:limit', val)
       }
+    },
+    totalPages() {
+      return Math.ceil(this.total / this.pageSize)
     }
   },
   methods: {
