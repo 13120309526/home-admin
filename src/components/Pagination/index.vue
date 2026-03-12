@@ -8,6 +8,12 @@
       :page-sizes="pageSizes"
       :pager-count="pagerCount"
       :total="total"
+      :total-text="totalText"
+      :page-size-text="pageSizeText"
+      :prev-text="prevText"
+      :next-text="nextText"
+      :jump-to-text="jumpToText"
+      :class-prefix="classPrefix"
       v-bind="$attrs"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -16,8 +22,6 @@
 </template>
 
 <script>
-import { scrollTo } from '@/utils/scroll-to'
-
 export default {
   name: 'Pagination',
   props: {
@@ -26,12 +30,12 @@ export default {
       type: Number
     },
     page: {
-      type: Number,
-      default: 1
+      required: true,
+      type: Number
     },
     limit: {
-      type: Number,
-      default: 20
+      required: true,
+      type: Number
     },
     pageSizes: {
       type: Array,
@@ -59,10 +63,31 @@ export default {
     hidden: {
       type: Boolean,
       default: false
-    }
-  },
-  data() {
-    return {
+    },
+    // 国际化文本
+    totalText: {
+      type: String,
+      default: '共'
+    },
+    pageSizeText: {
+      type: String,
+      default: '条/页'
+    },
+    prevText: {
+      type: String,
+      default: '上一页'
+    },
+    nextText: {
+      type: String,
+      default: '下一页'
+    },
+    jumpToText: {
+      type: String,
+      default: '跳至'
+    },
+    classPrefix: {
+      type: String,
+      default: 'el-pagination'
     }
   },
   computed: {
@@ -85,18 +110,15 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
-      if (this.currentPage * val > this.total) {
-        this.currentPage = 1
-      }
       this.$emit('pagination', { page: this.currentPage, limit: val })
       if (this.autoScroll) {
-        scrollTo(0, 800)
+        scrollTo(0, 0)
       }
     },
     handleCurrentChange(val) {
       this.$emit('pagination', { page: val, limit: this.pageSize })
       if (this.autoScroll) {
-        scrollTo(0, 800)
+        scrollTo(0, 0)
       }
     }
   }
@@ -105,7 +127,7 @@ export default {
 
 <style scoped>
 .pagination-container {
-  background: #fff;
+  padding: 32px 16px;
 }
 .pagination-container.hidden {
   display: none;
